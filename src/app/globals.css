@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --cyber-black: #0D0D0D;
+  --cyber-gunmetal: #1A1A1D;
+  --cyber-steel: #2D2D30;
+  --cyber-rust: #8B5A2B;
+  --cyber-copper: #A0522D;
+  --cyber-neon: #39FF14;
+  --cyber-neon-dim: #2ACC10;
+  --cyber-ash: #E0E0E0;
+  --cyber-smoke: #B0B0B0;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cyber-neon) var(--cyber-gunmetal);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--cyber-gunmetal);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--cyber-neon);
+  border-radius: 0;
+}
+
+body {
+  background-color: var(--cyber-black);
+  color: var(--cyber-ash);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.cyber-grid {
+  background-image:
+    linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.chamfer {
+  clip-path: polygon(
+    12px 0, calc(100% - 12px) 0,
+    100% 12px, 100% calc(100% - 12px),
+    calc(100% - 12px) 100%, 12px 100%,
+    0 calc(100% - 12px), 0 12px
+  );
+}
+
+.chamfer-sm {
+  clip-path: polygon(
+    6px 0, calc(100% - 6px) 0,
+    100% 6px, 100% calc(100% - 6px),
+    calc(100% - 6px) 100%, 6px 100%,
+    0 calc(100% - 6px), 0 6px
+  );
+}
+
+.neon-border {
+  position: relative;
+  border: 1px solid var(--cyber-neon);
+  box-shadow: 0 0 5px rgba(57, 255, 20, 0.3), inset 0 0 5px rgba(57, 255, 20, 0.1);
+}
+
+.btn-cyber {
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #39FF14;
+  color: #0D0D0D;
+  transition: all 0.2s;
+  font-family: 'Orbitron', sans-serif;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.btn-cyber:hover {
+  box-shadow: 0 0 10px #39FF14, 0 0 40px rgba(57, 255, 20, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-cyber-outline {
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid #39FF14;
+  color: #39FF14;
+  background-color: transparent;
+  transition: all 0.2s;
+  font-family: 'Orbitron', sans-serif;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.btn-cyber-outline:hover {
+  background-color: #39FF14;
+  color: #0D0D0D;
+  box-shadow: 0 0 5px #39FF14, 0 0 20px rgba(57, 255, 20, 0.3);
+}
+
+.card-cyber {
+  position: relative;
+  background-color: #1A1A1D;
+  border: 1px solid #2D2D30;
+  transition: all 0.3s;
+}
+
+.card-cyber:hover {
+  border-color: #39FF14;
+  box-shadow: 0 0 5px #39FF14, 0 0 20px rgba(57, 255, 20, 0.3);
+  transform: translateY(-4px);
+}
+
+.input-cyber {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #0D0D0D;
+  border: 1px solid #2D2D30;
+  color: #E0E0E0;
+  transition: all 0.2s;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.input-cyber::placeholder {
+  color: rgba(176, 176, 176, 0.5);
+}
+
+.input-cyber:focus {
+  border-color: #39FF14;
+  outline: none;
+  box-shadow: 0 0 5px rgba(57, 255, 20, 0.3), inset 0 0 5px rgba(57, 255, 20, 0.1);
+}
+
+.badge-cyber {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border: 1px solid #39FF14;
+  color: #39FF14;
+  font-family: 'Roboto Mono', monospace;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px var(--cyber-neon), 0 0 20px rgba(57, 255, 20, 0.5);
+}
+
+.skeleton-cyber {
+  background: linear-gradient(to right, #1A1A1D, #2D2D30, #1A1A1D);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-neon {
+  0%, 100% { box-shadow: 0 0 5px #39FF14, 0 0 20px rgba(57, 255, 20, 0.3); }
+  50% { box-shadow: 0 0 10px #39FF14, 0 0 40px rgba(57, 255, 20, 0.5); }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
