@@ -1,82 +1,90 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { getApisByIds } from '@/lib/api-data';
 import { useCartStore } from '@/lib/store';
-import { supabase } from '@/lib/supabase';
 import type { API } from '@/lib/supabase';
-import { Download, Share2, Copy, Check, Cpu, Loader2, ExternalLink, ArrowLeft, Sparkles } from 'lucide-react';
+import { ExternalLink, Plus, Check, Share2, ArrowLeft, Lock, Globe, Shield, Download, Terminal } from 'lucide-react';
+import ActionOverlay from '@/components/ActionOverlay';
 
-export default function CheckoutPage() {
-  const router = useRouter();
-  const { items, clearCart } = useCartStore();
-  const [collectionName, setCollectionName] = useState('My API Collection');
-  const [shareLink, setShareLink] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [recommendations, setRecommendations] = useState<API[]>([]);
-  const [loadingRecs, setLoadingRecs] = useState(false);
+function ShareContent() {
+  const searchParams = useSearchParams();
+  const [collection, setCollection] = useState<{ name: string; apis: API[] } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { addItem, isInCart } = useCartStore();
+  
+  // State untuk animasi Action Overlay
+  const [overlay, setOverlay] = useState({ isOpen: false, message: '' });
 
-  // Fetch AI recommendations (client-side fallback for static export)
   useEffect(() => {
-    if (items.length > 0) {
-      fetchRecommendations();
+    const data = searchParams.get('data');
+    if (data) {
+      try {
+        const decoded = JSON.parse(atob(data));
+        const apis = getApisByIds(decoded.apis);
+        setCollection({
+          name: decoded.name || 'Classified Payload',
+          apis
+        });
+      } catch (e) {
+        setError('TRANSMISSION CORRUPTED: Invalid share link');
+      }
+    } else {
+      setError('TRANSMISSION FAILED: No payload data found');
     }
-  }, [items]);
+  }, [searchParams]);
 
-  const fetchRecommendations = async () => {
-    setLoadingRecs(true);
-    try {
-      // Simple category-based recommendations (works without API)
-      const { apis } = await import('@/lib/api-data');
-      const selectedIds = items.map(api => api.id);
-      const selectedCategories = [...new Set(items.map(api => api.category))];
-
-      const recs = apis
-        .filter(api => !selectedIds.includes(api.id))
-        .filter(api => selectedCategories.includes(api.category))
-        .slice(0, 3);
-
-      setRecommendations(recs);
-    } catch (error) {
-      console.error('Failed to fetch recommendations:', error);
+  const getAuthIcon = (auth: string) => {
+    switch (auth.toLowerCase()) {
+      case 'apikey':
+        return <Lock className="w-3 h-3" />;
+      case 'oauth':
+        return <Shield className="w-3 h-3" />;
+      default:
+        return <Globe className="w-3 h-3" />;
     }
-    setLoadingRecs(false);
   };
 
-  const generateShareLink = async () => {
-    setLoading(true);
-    try {
-      // Generate a unique share ID
-      const shareId = Math.random().toString(36).substring(2, 10);
-
-      // For now, we'll create a client-side share link with base64 encoded data
-      const shareData = {
-        name: collectionName,
-        apis: items.map(api => api.id),
-      };
-      const encoded = btoa(JSON.stringify(shareData));
-      const link = `${window.location.origin}/share?data=${encoded}`;
-      setShareLink(link);
-    } catch (error) {
-      console.error('Failed to generate share link:', error);
+  const getAuthColor = (auth: string) => {
+    switch (auth.toLowerCase()) {
+      case 'apikey':
+        return 'border-cyber-neon text-cyber-neon';
+      case 'oauth':
+        return 'border-cyber-gold text-cyber-gold';
+      default:
+        return 'border-cyber-border text-cyber-text-light/50';
     }
-    setLoading(false);
   };
 
-  const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const addAllToCart = async () => {
+    if (collection) {
+      setOverlay({ isOpen: true, message: 'ACQUIRING ALL PAYLOADS...' });
+      
+      // Simulasi delay komputasi
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      collection.apis.forEach(api => addItem(api));
+      
+      setOverlay({ isOpen: false, message: '' });
+    }
   };
 
-  const exportAsJSON = () => {
+  const exportAsJSON = async () => {
+    if (!collection) return;
+
+    setOverlay({ isOpen: true, message: 'EXTRACTING PAYLOAD TO JSON...' });
+    
+    // Simulasi delay komputasi
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
     const exportData = {
-      name: collectionName,
+      name: collection.name,
       exportedAt: new Date().toISOString(),
-      totalApis: items.length,
-      apis: items.map(api => ({
+      totalApis: collection.apis.length,
+      operator: 'laramultiapiagent - received share',
+      apis: collection.apis.map(api => ({
         name: api.name,
         description: api.description,
         url: api.url,
@@ -91,292 +99,194 @@ export default function CheckoutPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${collectionName.replace(/\s+/g, '-').toLowerCase()}.json`;
+    a.download = `${collection.name.replace(/\s+/g, '-').toLowerCase()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    setOverlay({ isOpen: false, message: '' });
   };
 
-  const exportAsMarkdown = () => {
-    let markdown = `# ${collectionName}\n\n`;
-    markdown += `> Exported from API FORGE on ${new Date().toLocaleDateString()}\n\n`;
-    markdown += `**Total APIs:** ${items.length}\n\n`;
-    markdown += `---\n\n`;
-
-    // Group by category
-    const byCategory = items.reduce((acc, api) => {
-      if (!acc[api.category]) acc[api.category] = [];
-      acc[api.category].push(api);
-      return acc;
-    }, {} as Record<string, typeof items>);
-
-    for (const [category, apis] of Object.entries(byCategory)) {
-      markdown += `## ${category}\n\n`;
-      markdown += `| API | Description | Auth | HTTPS | CORS |\n`;
-      markdown += `|-----|-------------|------|-------|------|\n`;
-      for (const api of apis) {
-        markdown += `| [${api.name}](${api.url}) | ${api.description} | ${api.auth} | ${api.https ? 'Yes' : 'No'} | ${api.cors} |\n`;
-      }
-      markdown += `\n`;
-    }
-
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${collectionName.replace(/\s+/g, '-').toLowerCase()}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  if (items.length === 0) {
+  // Tampilan Error
+  if (error) {
     return (
-      <div className="min-h-screen cyber-grid flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-[#E0E0E0] mb-4" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            NO APIs SELECTED
+      <div className="min-h-[70vh] flex items-center justify-center px-4 w-full">
+        <div className="bg-cyber-surface border-2 border-cyber-border p-12 text-center chamfer shadow-tactical max-w-lg w-full">
+          <div className="w-16 h-16 mx-auto mb-6 bg-red-950/30 border-2 border-red-500/50 flex items-center justify-center chamfer-sm">
+            <Terminal className="w-8 h-8 text-red-500" />
+          </div>
+          <h1 className="font-heading text-2xl font-black text-red-500 mb-4 uppercase tracking-widest">
+            ERROR 404
           </h1>
-          <p className="text-[#B0B0B0] mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Add some APIs to your cart first
+          <p className="font-mono text-sm text-cyber-text-light/70 mb-8">
+            {error}
           </p>
-          <Link href="/catalog" className="btn-cyber">
-            BROWSE CATALOG
+          <Link href="/" className="btn-cyber inline-flex">
+            RETURN TO BASE
           </Link>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen cyber-grid py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Link */}
-        <Link
-          href="/cart"
-          className="inline-flex items-center gap-2 text-[#B0B0B0] hover:text-[#39FF14] transition-colors mb-8"
-          style={{ fontFamily: 'Roboto Mono, monospace' }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          BACK TO CART
-        </Link>
-
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#E0E0E0] mb-2" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            CHECKOUT
-          </h1>
-          <p className="text-[#B0B0B0]" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Export or share your API collection
-          </p>
-        </div>
-
-        {/* Collection Name */}
-        <div className="card-cyber p-6 mb-6">
-          <label className="block text-[#B0B0B0] text-sm mb-2" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-            COLLECTION NAME
-          </label>
-          <input
-            type="text"
-            value={collectionName}
-            onChange={(e) => setCollectionName(e.target.value)}
-            className="input-cyber"
-            placeholder="Enter collection name..."
-          />
-        </div>
-
-        {/* Summary */}
-        <div className="card-cyber p-6 mb-6">
-          <h2 className="text-xl font-bold text-[#E0E0E0] mb-4" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            COLLECTION SUMMARY
-          </h2>
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 border border-[#2D2D30]">
-              <div className="text-2xl font-bold text-[#39FF14]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-                {items.length}
-              </div>
-              <div className="text-[#B0B0B0] text-sm" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-                APIs
-              </div>
-            </div>
-            <div className="text-center p-4 border border-[#2D2D30]">
-              <div className="text-2xl font-bold text-[#8B5A2B]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-                {new Set(items.map(api => api.category)).size}
-              </div>
-              <div className="text-[#B0B0B0] text-sm" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-                Categories
-              </div>
-            </div>
-            <div className="text-center p-4 border border-[#2D2D30]">
-              <div className="text-2xl font-bold text-[#E0E0E0]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-                {items.filter(api => api.auth === 'No').length}
-              </div>
-              <div className="text-[#B0B0B0] text-sm" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-                Free APIs
-              </div>
-            </div>
+  // Tampilan Loading Awal
+  if (!collection) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center w-full">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-cyber-border border-t-cyber-neon rounded-full animate-spin"></div>
+          <div className="font-mono text-cyber-neon text-sm uppercase tracking-widest font-bold animate-pulse">
+            Decrypting Transmission...
           </div>
-
-          {/* API List */}
-          <div className="max-h-60 overflow-y-auto space-y-2">
-            {items.map((api) => (
-              <div key={api.id} className="flex items-center justify-between p-3 bg-[#0D0D0D] border border-[#2D2D30]">
-                <div className="flex items-center gap-3">
-                  <span className="text-[#E0E0E0] font-medium" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {api.name}
-                  </span>
-                  <span className="text-xs text-[#8B5A2B]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-                    {api.category}
-                  </span>
-                </div>
-                <a
-                  href={api.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#B0B0B0] hover:text-[#39FF14]"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* AI Recommendations */}
-        {(loadingRecs || recommendations.length > 0) && (
-          <div className="card-cyber p-6 mb-6 border-[#8B5A2B]">
-            <div className="flex items-center gap-2 mb-4">
-              <Cpu className="w-5 h-5 text-[#8B5A2B]" />
-              <h2 className="text-xl font-bold text-[#E0E0E0]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-                AI RECOMMENDATIONS
-              </h2>
-            </div>
-            {loadingRecs ? (
-              <div className="flex items-center gap-3 text-[#B0B0B0]">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Analyzing your selection...</span>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-[#B0B0B0] text-sm mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                  Based on your selection, you might also like:
-                </p>
-                {recommendations.map((api) => (
-                  <div key={api.id} className="flex items-center justify-between p-3 bg-[#0D0D0D] border border-[#8B5A2B]/30">
-                    <div>
-                      <span className="text-[#E0E0E0] font-medium" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                        {api.name}
-                      </span>
-                      <span className="text-xs text-[#B0B0B0] ml-2">
-                        {api.description.slice(0, 50)}...
-                      </span>
-                    </div>
-                    <Sparkles className="w-4 h-4 text-[#8B5A2B]" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Export Options */}
-        <div className="card-cyber p-6 mb-6">
-          <h2 className="text-xl font-bold text-[#E0E0E0] mb-4" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            EXPORT OPTIONS
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              onClick={exportAsJSON}
-              className="btn-cyber-outline flex items-center justify-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              EXPORT AS JSON
-            </button>
-            <button
-              onClick={exportAsMarkdown}
-              className="btn-cyber-outline flex items-center justify-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              EXPORT AS MARKDOWN
-            </button>
-          </div>
-        </div>
-
-        {/* Share Options */}
-        <div className="card-cyber p-6 mb-6">
-          <h2 className="text-xl font-bold text-[#E0E0E0] mb-4" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            SHARE COLLECTION
-          </h2>
-          {!shareLink ? (
-            <button
-              onClick={generateShareLink}
-              disabled={loading}
-              className="btn-cyber w-full flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  GENERATING...
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-5 h-5" />
-                  GENERATE SHARE LINK
-                </>
-              )}
-            </button>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={shareLink}
-                  readOnly
-                  className="input-cyber flex-1"
-                />
-                <button
-                  onClick={() => copyToClipboard(shareLink)}
-                  className="btn-cyber flex items-center gap-2"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-5 h-5" />
-                      COPIED
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-5 h-5" />
-                      COPY
-                    </>
-                  )}
-                </button>
-              </div>
-              <p className="text-[#B0B0B0] text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Share this link to let others view your API collection
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Done Button */}
-        <div className="flex gap-4">
-          <Link href="/catalog" className="btn-cyber-outline flex-1 flex items-center justify-center">
-            CONTINUE BROWSING
-          </Link>
-          <button
-            onClick={() => {
-              clearCart();
-              router.push('/');
-            }}
-            className="btn-cyber flex-1 flex items-center justify-center gap-2"
-          >
-            <Check className="w-5 h-5" />
-            DONE
-          </button>
         </div>
       </div>
+    );
+  }
+
+  // Tampilan Utama (Berhasil Load)
+  return (
+    <div className="w-full max-w-4xl mx-auto py-8">
+      {/* Panggil komponen Overlay */}
+      <ActionOverlay isOpen={overlay.isOpen} message={overlay.message} />
+
+      {/* Back Link */}
+      <Link
+        href="/"
+        className="inline-flex items-center gap-2 font-mono text-cyber-text-light/60 hover:text-cyber-neon transition-colors mb-8 uppercase text-sm font-bold tracking-widest"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Return to Base
+      </Link>
+
+      {/* Header Info */}
+      <div className="card-cyber p-6 mb-8 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-cyber-neon opacity-[0.03] blur-2xl group-hover:opacity-[0.1] transition-opacity"></div>
+        
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-cyber-bg border-2 border-cyber-border flex items-center justify-center chamfer-sm">
+            <Share2 className="w-5 h-5 text-cyber-neon" />
+          </div>
+          <h1 className="font-heading text-xl font-bold text-cyber-text-light uppercase tracking-widest">
+            Incoming Payload
+          </h1>
+        </div>
+        
+        <h2 className="font-heading text-3xl font-black text-cyber-neon mb-2 uppercase tracking-wide text-glow">
+          {collection.name}
+        </h2>
+        
+        <div className="inline-flex items-center gap-2 font-mono text-cyber-gold text-xs uppercase tracking-widest border border-cyber-gold/30 px-3 py-1 bg-cyber-bg">
+          <span className="w-2 h-2 bg-cyber-gold animate-pulse"></span>
+          {collection.apis.length} Targets Acquired
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-10">
+        <button onClick={addAllToCart} className="btn-cyber flex-1 flex items-center justify-center gap-2 text-sm">
+          <Plus className="w-5 h-5" />
+          Acquire All Targets
+        </button>
+        <button onClick={exportAsJSON} className="btn-cyber-outline flex-1 flex items-center justify-center gap-2 text-sm">
+          <Download className="w-5 h-5" />
+          Extract to JSON
+        </button>
+      </div>
+
+      {/* API List */}
+      <div className="space-y-4">
+        <div className="font-heading text-lg font-bold text-cyber-text-light uppercase tracking-widest mb-4 border-b-2 border-cyber-border pb-2">
+          Payload Details
+        </div>
+        
+        {collection.apis.map((api) => {
+          const inCart = isInCart(api.id);
+          return (
+            <div key={api.id} className="card-cyber p-5 hover:border-cyber-neon transition-colors group">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-heading text-xl font-bold text-cyber-text-light uppercase tracking-wide">
+                      {api.name}
+                    </h3>
+                    <a
+                      href={api.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-cyber-text-light/40 hover:text-cyber-neon transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                  
+                  <p className="font-sans text-sm text-cyber-text-light/70 mb-4 line-clamp-2">
+                    {api.description}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border bg-cyber-bg ${getAuthColor(api.auth)}`}>
+                      {getAuthIcon(api.auth)}
+                      {api.auth === 'No' ? 'NO CLEARANCE' : api.auth.toUpperCase()}
+                    </span>
+                    <span className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border border-cyber-canvas-light text-cyber-canvas-light bg-cyber-bg">
+                      {api.category}
+                    </span>
+                    {api.https && (
+                      <span className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border border-cyber-neon/50 text-cyber-neon bg-cyber-bg">
+                        HTTPS
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-2 sm:mt-0 flex-shrink-0">
+                  <button
+                    onClick={() => addItem(api)}
+                    disabled={inCart}
+                    className={`w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 text-xs font-mono font-bold uppercase tracking-widest transition-all chamfer-sm ${
+                      inCart
+                        ? 'bg-cyber-neon text-cyber-bg cursor-not-allowed shadow-neon'
+                        : 'border-2 border-cyber-neon text-cyber-neon hover:bg-cyber-neon hover:text-cyber-bg hover:shadow-neon'
+                    }`}
+                  >
+                    {inCart ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Acquired
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Acquire
+                      </>
+                    )}
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
+  );
+}
+
+export default function SharePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[70vh] flex items-center justify-center w-full">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-cyber-border border-t-cyber-neon rounded-full animate-spin"></div>
+          <div className="font-mono text-cyber-neon text-sm uppercase tracking-widest font-bold animate-pulse">
+            Establishing Link...
+          </div>
+        </div>
+      </div>
+    }>
+      <ShareContent />
+    </Suspense>
   );
 }

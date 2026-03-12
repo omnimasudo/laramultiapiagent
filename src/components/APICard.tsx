@@ -2,7 +2,10 @@
 
 import { useCartStore } from '@/lib/store';
 import type { API } from '@/lib/supabase';
-import { ExternalLink, Plus, Check, Lock, Globe, Shield } from 'lucide-react';
+import { ExternalLink, Plus, Check, Lock, Globe, Shield, Terminal, Server } from 'lucide-react';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
+import { useState } from 'react';
 
 interface APICardProps {
   api: API;
@@ -11,103 +14,134 @@ interface APICardProps {
 export default function APICard({ api }: APICardProps) {
   const { addItem, removeItem, isInCart } = useCartStore();
   const inCart = isInCart(api.id);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const getAuthIcon = (auth: string) => {
-    switch (auth.toLowerCase()) {
-      case 'apikey':
-        return <Lock className="w-3 h-3" />;
-      case 'oauth':
-        return <Shield className="w-3 h-3" />;
-      default:
-        return <Globe className="w-3 h-3" />;
+  const toggleCart = () => {
+    if (inCart) {
+      removeItem(api.id);
+    } else if (api) {
+      addItem(api);
     }
   };
 
-  const getAuthColor = (auth: string) => {
-    switch (auth.toLowerCase()) {
-      case 'apikey':
-        return 'border-[#39FF14] text-[#39FF14]';
-      case 'oauth':
-        return 'border-yellow-500 text-yellow-500';
-      default:
-        return 'border-[#B0B0B0]/50 text-[#B0B0B0]/50';
+  const getStatusColor = (auth: string) => {
+    switch (auth?.toLowerCase()) {
+      case 'apikey': return 'text-cyber-neon border-cyber-neon';
+      case 'oauth': return 'text-cyber-gold border-cyber-gold';
+      default: return 'text-cyber-text-light/50 border-cyber-text-light/30';
     }
   };
+
+  // Generate deterministic "stats" based on ID for visual flair
+  const latency = (api.name.charCodeAt(0) % 50) + 10; 
+  const uptime = 99 + (api.name.length % 10) / 10;
 
   return (
-    <div className="card-cyber p-4 flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <h3
-          className="text-[#E0E0E0] font-bold text-lg leading-tight truncate"
-          style={{ fontFamily: 'Orbitron, sans-serif' }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      transition={{ duration: 0.3 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className="relative group h-full"
+    >
+      {/* Background & Clip Path Container */}
+      <div className="absolute inset-0 bg-cyber-bg border border-cyber-surface clip-tactical transition-all duration-300 group-hover:border-cyber-neon/50 group-hover:shadow-neon-hover z-0"></div>
+      
+      {/* Animated Scanline Overlay */}
+      <div className="absolute inset-0 clip-tactical overflow-hidden pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+        <div className="w-full h-[200%] bg-gradient-to-b from-transparent via-cyber-neon/5 to-transparent animate-scan-line"></div>
+      </div>
+
+      <div className="relative p-6 flex flex-col h-full z-20">
+        {/* Header: Name & Link */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1 pr-4 overflow-hidden">
+            <h3 className={clsx(
+              "font-heading text-lg font-bold uppercase tracking-wider transition-all duration-300 truncate",
+              isHovered ? "text-cyber-neon text-glow" : "text-cyber-text-light"
+            )}>
+              {api.name}
+            </h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={clsx("px-2 py-0.5 text-[10px] uppercase font-mono border", getStatusColor(api.auth || ''))}>
+                {api.auth || 'Open'}
+              </span>
+              <span className="text-[10px] font-mono text-cyber-text-light/40 flex items-center gap-1 truncate">
+                <Server className="w-3 h-3" /> ID: {api.id.substring(0, 8)}
+              </span>
+            </div>
+          </div>
+          
+          <a
+            href={api.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 hover:bg-cyber-neon/10 rounded-sm group/link transition-colors border border-transparent hover:border-cyber-neon/30"
+          >
+            <ExternalLink className="w-4 h-4 text-cyber-text-light/50 group-hover/link:text-cyber-neon transition-colors" />
+          </a>
+        </div>
+
+        {/* Description Styled as Terminal Output */}
+        <div className="bg-black/40 border-l-2 border-cyber-border p-3 mb-4 flex-grow font-mono text-xs text-cyber-text-light/70 relative overflow-hidden">
+          <div className="absolute top-1 right-1 opacity-20">
+            <Terminal className="w-3 h-3" />
+          </div>
+          <p className="line-clamp-3 leading-relaxed">
+            <span className="text-cyber-neon/50 mr-2">$</span>
+            {api.description}
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-2 mb-4 text-[10px] font-mono border-t border-cyber-surface pt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-cyber-text-light/40">LATENCY</span>
+            <span className="text-cyber-neon">{latency}ms</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-cyber-text-light/40">UPTIME</span>
+            <span className="text-cyber-gold">{uptime}%</span>
+          </div>
+          
+          {/* Fake Progress Bar */}
+          <div className="col-span-2 h-1 bg-cyber-surface mt-1 overflow-hidden relative">
+             <motion.div 
+               className="h-full bg-cyber-neon"
+               initial={{ width: "30%" }}
+               animate={{ width: isHovered ? "100%" : "30%" }}
+               transition={{ duration: 1, ease: "circOut" }}
+             />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <button
+          onClick={toggleCart}
+          className={clsx(
+            "w-full py-3 px-4 flex items-center justify-center gap-2 font-heading text-sm font-bold uppercase tracking-widest transition-all duration-300 clip-tactical-b",
+            inCart 
+              ? "bg-cyber-canvas text-cyber-text-dark border-cyber-canvas hover:brightness-110" 
+              : "bg-transparent border border-cyber-neon/50 text-cyber-neon hover:bg-cyber-neon hover:text-black hover:shadow-neon"
+          )}
         >
-          {api.name}
-        </h3>
-        <a
-          href={api.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-shrink-0 p-1.5 text-[#B0B0B0] hover:text-[#39FF14] hover:bg-[#39FF14]/10 transition-colors"
-          title="View Documentation"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </a>
+          {inCart ? (
+            <>
+              <Check className="w-4 h-4" /> Initiated
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" /> Deploy Agent
+            </>
+          )}
+        </button>
       </div>
-
-      {/* Description */}
-      <p className="text-[#B0B0B0] text-sm mb-4 line-clamp-2 flex-grow" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-        {api.description}
-      </p>
-
-      {/* Badges */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs border ${getAuthColor(api.auth)}`} style={{ fontFamily: 'Roboto Mono, monospace' }}>
-          {getAuthIcon(api.auth)}
-          {api.auth === 'No' ? 'FREE' : api.auth.toUpperCase()}
-        </span>
-        {api.https && (
-          <span className="inline-flex items-center px-2 py-0.5 text-xs border border-green-500/50 text-green-500" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-            HTTPS
-          </span>
-        )}
-        {api.cors === 'Yes' && (
-          <span className="inline-flex items-center px-2 py-0.5 text-xs border border-blue-500/50 text-blue-500" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-            CORS
-          </span>
-        )}
-      </div>
-
-      {/* Category */}
-      <div className="text-xs text-[#8B5A2B] mb-4 uppercase tracking-wide" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-        {api.category}
-      </div>
-
-      {/* Add to Cart Button */}
-      <button
-        onClick={() => inCart ? removeItem(api.id) : addItem(api)}
-        className={`w-full py-2.5 flex items-center justify-center gap-2 font-bold uppercase tracking-wider text-sm transition-all ${
-          inCart
-            ? 'bg-[#39FF14] text-[#0D0D0D]'
-            : 'border border-[#39FF14] text-[#39FF14] hover:bg-[#39FF14] hover:text-[#0D0D0D]'
-        }`}
-        style={{
-          fontFamily: 'Orbitron, sans-serif',
-          clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)'
-        }}
-      >
-        {inCart ? (
-          <>
-            <Check className="w-4 h-4" />
-            IN CART
-          </>
-        ) : (
-          <>
-            <Plus className="w-4 h-4" />
-            ADD TO CART
-          </>
-        )}
-      </button>
-    </div>
+      
+      {/* Decorative Corners */}
+      <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyber-border group-hover:border-cyber-neon/50 transition-colors duration-500 z-20"></div>
+      <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyber-border group-hover:border-cyber-neon/50 transition-colors duration-500 z-20"></div>
+    </motion.div>
   );
 }

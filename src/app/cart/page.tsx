@@ -1,11 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store';
-import { Trash2, ExternalLink, ArrowRight, ShoppingCart, Zap, Lock, Globe, Shield } from 'lucide-react';
+import { Trash2, ExternalLink, ArrowRight, ShoppingCart, Zap, Lock, Globe, Shield, Terminal } from 'lucide-react';
 
 export default function CartPage() {
   const { items, removeItem, clearCart } = useCartStore();
+  const [mounted, setMounted] = useState(false);
+
+  // Mencegah hydration mismatch saat load dari local storage
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const getAuthIcon = (auth: string) => {
     switch (auth.toLowerCase()) {
@@ -21,139 +28,159 @@ export default function CartPage() {
   const getAuthColor = (auth: string) => {
     switch (auth.toLowerCase()) {
       case 'apikey':
-        return 'border-[#39FF14] text-[#39FF14]';
+        return 'border-cyber-neon text-cyber-neon';
       case 'oauth':
-        return 'border-yellow-500 text-yellow-500';
+        return 'border-cyber-gold text-cyber-gold';
       default:
-        return 'border-[#B0B0B0]/50 text-[#B0B0B0]/50';
+        return 'border-cyber-border text-cyber-text-light/50';
     }
   };
 
+  if (!mounted) return null;
+
+  // EMPTY STATE
   if (items.length === 0) {
     return (
-      <div className="min-h-screen cyber-grid flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-6 border border-[#2D2D30] flex items-center justify-center chamfer">
-            <ShoppingCart className="w-12 h-12 text-[#B0B0B0]" />
+      <div className="min-h-[70vh] flex items-center justify-center px-4 w-full">
+        <div className="bg-cyber-surface border-2 border-cyber-border p-12 text-center chamfer shadow-tactical max-w-lg w-full relative">
+          {/* Decorative Corner */}
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyber-neon -translate-x-2 translate-y-2"></div>
+          
+          <div className="w-20 h-20 mx-auto mb-6 bg-cyber-bg border-2 border-cyber-border flex items-center justify-center chamfer-sm">
+            <ShoppingCart className="w-10 h-10 text-cyber-text-light/30" />
           </div>
-          <h1 className="text-2xl font-bold text-[#E0E0E0] mb-4" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            CART EMPTY
+          <h1 className="font-heading text-2xl font-black text-cyber-text-light mb-4 uppercase tracking-widest">
+            PAYLOAD EMPTY
           </h1>
-          <p className="text-[#B0B0B0] mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Start adding APIs to your collection
+          <p className="font-mono text-sm text-cyber-text-light/60 mb-8 uppercase tracking-wider">
+            No targets acquired. Scan the catalog.
           </p>
           <Link href="/catalog" className="btn-cyber inline-flex items-center gap-2">
             <Zap className="w-5 h-5" />
-            BROWSE CATALOG
+            Access Terminal
           </Link>
         </div>
       </div>
     );
   }
 
+  // ACTIVE CART STATE
   return (
-    <div className="min-h-screen cyber-grid py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-[#E0E0E0] mb-2" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-              YOUR CART
-            </h1>
-            <p className="text-[#B0B0B0]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-              {items.length} API{items.length !== 1 ? 's' : ''} selected
-            </p>
+    <div className="w-full max-w-4xl mx-auto py-8">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 border-l-4 border-cyber-neon pl-4">
+        <div>
+          <h1 className="font-heading text-3xl font-black text-cyber-text-light mb-1 uppercase tracking-widest">
+            Active Payload
+          </h1>
+          <div className="inline-flex items-center gap-2 font-mono text-cyber-neon text-xs uppercase tracking-widest font-bold">
+            <span className="w-2 h-2 bg-cyber-neon animate-pulse"></span>
+            {items.length} Target{items.length !== 1 ? 's' : ''} Locked
           </div>
-          <button
-            onClick={clearCart}
-            className="flex items-center gap-2 px-4 py-2 border border-red-500/50 text-red-500 hover:bg-red-500/10 transition-colors"
-            style={{ fontFamily: 'Roboto Mono, monospace' }}
-          >
-            <Trash2 className="w-4 h-4" />
-            CLEAR ALL
-          </button>
         </div>
+        <button
+          onClick={clearCart}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-red-950/20 border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all font-mono text-xs uppercase font-bold tracking-widest chamfer-sm group"
+        >
+          <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          Abort All
+        </button>
+      </div>
 
-        {/* Cart Items */}
-        <div className="space-y-4 mb-8">
-          {items.map((api) => (
-            <div key={api.id} className="card-cyber p-4 flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-[#E0E0E0] font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-                    {api.name}
-                  </h3>
-                  <a
-                    href={api.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#B0B0B0] hover:text-[#39FF14] transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-                <p className="text-[#B0B0B0] text-sm mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                  {api.description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs border ${getAuthColor(api.auth)}`} style={{ fontFamily: 'Roboto Mono, monospace' }}>
-                    {getAuthIcon(api.auth)}
-                    {api.auth === 'No' ? 'FREE' : api.auth.toUpperCase()}
-                  </span>
-                  <span className="px-2 py-0.5 text-xs border border-[#8B5A2B]/50 text-[#8B5A2B]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-                    {api.category}
-                  </span>
-                </div>
+      {/* Cart Items List */}
+      <div className="space-y-4 mb-8">
+        {items.map((api) => (
+          <div key={api.id} className="card-cyber p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 group">
+            
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="font-heading text-xl font-bold text-cyber-text-light uppercase tracking-wide group-hover:text-cyber-neon transition-colors">
+                  {api.name}
+                </h3>
+                <a
+                  href={api.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyber-text-light/40 hover:text-cyber-neon transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
               </div>
-              <button
-                onClick={() => removeItem(api.id)}
-                className="p-2 text-[#B0B0B0] hover:text-red-500 hover:bg-red-500/10 transition-colors"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              <p className="font-sans text-sm text-cyber-text-light/70 mb-4 line-clamp-2">
+                {api.description}
+              </p>
+              
+              <div className="flex flex-wrap gap-2">
+                <span className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border bg-cyber-bg ${getAuthColor(api.auth)}`}>
+                  {getAuthIcon(api.auth)}
+                  {api.auth === 'No' ? 'NO CLEARANCE' : api.auth.toUpperCase()}
+                </span>
+                <span className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border border-cyber-canvas-light text-cyber-canvas-light bg-cyber-bg">
+                  {api.category}
+                </span>
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Summary */}
-        <div className="card-cyber p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[#B0B0B0]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-              TOTAL APIs
+            <button
+              onClick={() => removeItem(api.id)}
+              className="w-full sm:w-auto p-3 sm:p-2 bg-cyber-bg border-2 border-cyber-border text-cyber-text-light/50 hover:border-red-500 hover:text-red-500 hover:bg-red-950/20 transition-all flex justify-center chamfer-sm"
+              title="Remove Target"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Tactical Summary */}
+      <div className="card-cyber p-6 mb-8 border-cyber-neon shadow-[4px_4px_0px_var(--cyber-neon)]">
+        <h2 className="font-heading text-lg font-bold text-cyber-text-light mb-6 uppercase tracking-widest border-b border-cyber-border pb-2 flex items-center gap-2">
+          <Terminal className="w-5 h-5 text-cyber-neon" />
+          Payload Summary
+        </h2>
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-cyber-text-light/70 text-xs uppercase tracking-widest font-bold">
+              Total Targets
             </span>
-            <span className="text-2xl font-bold text-[#39FF14]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+            <span className="font-heading text-2xl font-black text-cyber-neon">
               {items.length}
             </span>
           </div>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[#B0B0B0]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-              FREE (No Auth)
+          
+          <div className="flex items-center justify-between border-t border-cyber-border pt-4">
+            <span className="font-mono text-cyber-text-light/70 text-xs uppercase tracking-widest font-bold">
+              No Clearance Req (Free)
             </span>
-            <span className="text-[#E0E0E0]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+            <span className="font-heading text-xl font-bold text-cyber-text-light">
               {items.filter(api => api.auth === 'No').length}
             </span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-[#B0B0B0]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
-              CATEGORIES
+          
+          <div className="flex items-center justify-between border-t border-cyber-border pt-4">
+            <span className="font-mono text-cyber-text-light/70 text-xs uppercase tracking-widest font-bold">
+              Active Sectors
             </span>
-            <span className="text-[#E0E0E0]" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+            <span className="font-heading text-xl font-bold text-cyber-gold">
               {new Set(items.map(api => api.category)).size}
             </span>
           </div>
         </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/catalog" className="btn-cyber-outline flex-1 flex items-center justify-center gap-2">
-            ADD MORE APIs
-          </Link>
-          <Link href="/checkout" className="btn-cyber flex-1 flex items-center justify-center gap-2">
-            PROCEED TO CHECKOUT
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
       </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Link href="/catalog" className="btn-cyber-outline flex-1 flex items-center justify-center gap-2 bg-cyber-surface">
+          Scan Catalog
+        </Link>
+        <Link href="/checkout" className="btn-cyber flex-1 flex items-center justify-center gap-2 font-black shadow-neon">
+          Initialize Extraction
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </div>
+      
     </div>
   );
 }

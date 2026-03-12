@@ -1,90 +1,146 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --cyber-black: #0D0D0D;
-  --cyber-gunmetal: #1A1A1D;
-  --cyber-steel: #2D2D30;
-  --cyber-rust: #8B5A2B;
-  --cyber-copper: #A0522D;
-  --cyber-neon: #39FF14;
-  --cyber-neon-dim: #2ACC10;
-  --cyber-ash: #E0E0E0;
-  --cyber-smoke: #B0B0B0;
+@layer base {
+  :root {
+    /* Base & Surfaces (Undershirt & Eyepatch) */
+    --cyber-bg: #030303;        /* Deep Black */
+    --cyber-surface: #0a0a0a;   /* Slightly lighter black */
+    --cyber-border: #1a1a1a;    /* Dark gray border */
+
+    /* Primary Surfaces / Cards (Mechanic Apron) */
+    --cyber-canvas: #8c5e35;    /* Worn canvas brown */
+    --cyber-canvas-light: #a67c52; /* Khaki */
+
+    /* Accents (Glowing Eye, Goggles) */
+    --cyber-neon: #39FF14;      /* Toxic green */
+    --cyber-gold: #d4b856;      /* Muted gold (Hair/Brass) */
+
+    /* Text Colors */
+    --cyber-text-light: #e5e7eb; /* Off-white for dark bg */
+    --cyber-text-dark: #2d1b0d;  /* Dark brown for canvas cards */
+  }
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--cyber-neon) var(--cyber-gunmetal);
-}
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--cyber-canvas) var(--cyber-bg);
+  }
 
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-*::-webkit-scrollbar-track {
-  background: var(--cyber-gunmetal);
-}
+  *::-webkit-scrollbar-track {
+    background: var(--cyber-bg);
+  }
 
-*::-webkit-scrollbar-thumb {
-  background: var(--cyber-neon);
-  border-radius: 0;
+  *::-webkit-scrollbar-thumb {
+    background: var(--cyber-canvas);
+    border: 1px solid var(--cyber-bg);
+    border-radius: 0;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--cyber-neon);
+  }
+
+  .clip-tactical {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - 15px),
+      calc(100% - 15px) 100%,
+      0 100%
+    );
+  }
+
+  .clip-tactical-b {
+    clip-path: polygon(
+      20px 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 20px
+    );
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
+  }
+
+  .scanline-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0) 50%,
+      rgba(0, 0, 0, 0.2) 50%,
+      rgba(0, 0, 0, 0.2)
+    );
+    background-size: 100% 4px;
+    animation: scanline 0.2s linear infinite;
+    pointer-events: none;
+  }
 }
 
 body {
-  background-color: var(--cyber-black);
-  color: var(--cyber-ash);
+  background-color: var(--cyber-bg);
+  color: var(--cyber-text-light);
   font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
 }
 
+/* TACTICAL UTILITIES & CLASSES */
 .cyber-grid {
   background-image:
     linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
+  background-size: 40px 40px;
 }
 
+/* Industrial Chamfer (Cut corners) */
 .chamfer {
   clip-path: polygon(
-    12px 0, calc(100% - 12px) 0,
-    100% 12px, 100% calc(100% - 12px),
-    calc(100% - 12px) 100%, 12px 100%,
-    0 calc(100% - 12px), 0 12px
+    8px 0, calc(100% - 8px) 0,
+    100% 8px, 100% calc(100% - 8px),
+    calc(100% - 8px) 100%, 8px 100%,
+    0 calc(100% - 8px), 0 8px
   );
 }
 
 .chamfer-sm {
   clip-path: polygon(
-    6px 0, calc(100% - 6px) 0,
-    100% 6px, 100% calc(100% - 6px),
-    calc(100% - 6px) 100%, 6px 100%,
-    0 calc(100% - 6px), 0 6px
+    4px 0, calc(100% - 4px) 0,
+    100% 4px, 100% calc(100% - 4px),
+    calc(100% - 4px) 100%, 4px 100%,
+    0 calc(100% - 4px), 0 4px
   );
 }
 
-.neon-border {
-  position: relative;
-  border: 1px solid var(--cyber-neon);
-  box-shadow: 0 0 5px rgba(57, 255, 20, 0.3), inset 0 0 5px rgba(57, 255, 20, 0.1);
-}
-
+/* Tactical Buttons */
 .btn-cyber {
   position: relative;
   padding: 0.75rem 1.5rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background-color: #39FF14;
-  color: #0D0D0D;
-  transition: all 0.2s;
+  background-color: var(--cyber-neon);
+  color: var(--cyber-bg);
+  border: 2px solid var(--cyber-neon);
+  transition: all 0.3s ease;
   font-family: 'Orbitron', sans-serif;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  border-radius: 2px;
 }
 
 .btn-cyber:hover {
-  box-shadow: 0 0 10px #39FF14, 0 0 40px rgba(57, 255, 20, 0.4);
+  background-color: transparent;
+  color: var(--cyber-neon);
+  box-shadow: 0 0 10px var(--cyber-neon), inset 0 0 10px rgba(57, 255, 20, 0.2);
   transform: translateY(-2px);
 }
 
@@ -94,71 +150,87 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border: 2px solid #39FF14;
-  color: #39FF14;
-  background-color: transparent;
-  transition: all 0.2s;
+  border: 2px solid var(--cyber-border);
+  color: var(--cyber-text-light);
+  background-color: var(--cyber-surface);
+  transition: all 0.3s ease;
   font-family: 'Orbitron', sans-serif;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  border-radius: 2px;
 }
 
 .btn-cyber-outline:hover {
-  background-color: #39FF14;
-  color: #0D0D0D;
-  box-shadow: 0 0 5px #39FF14, 0 0 20px rgba(57, 255, 20, 0.3);
+  border-color: var(--cyber-gold);
+  color: var(--cyber-gold);
+  transform: translateY(-2px);
 }
 
+/* Tactical Card (Canvas Brown/Mechanic Apron) */
 .card-cyber {
   position: relative;
-  background-color: #1A1A1D;
-  border: 1px solid #2D2D30;
-  transition: all 0.3s;
+  background-color: var(--cyber-canvas);
+  border: 2px solid var(--cyber-border);
+  color: var(--cyber-text-dark);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+  box-shadow: 4px 4px 0px #111;
 }
 
 .card-cyber:hover {
-  border-color: #39FF14;
-  box-shadow: 0 0 5px #39FF14, 0 0 20px rgba(57, 255, 20, 0.3);
+  border-color: var(--cyber-border);
+  box-shadow: 4px 4px 0px var(--cyber-neon);
   transform: translateY(-4px);
 }
 
+/* Input Fields (Industrial feel) */
 .input-cyber {
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: #0D0D0D;
-  border: 1px solid #2D2D30;
-  color: #E0E0E0;
-  transition: all 0.2s;
+  background-color: var(--cyber-surface);
+  border: 2px solid var(--cyber-border);
+  color: var(--cyber-text-light);
+  transition: all 0.3s;
   font-family: 'Roboto Mono', monospace;
+  border-radius: 2px;
 }
 
 .input-cyber::placeholder {
-  color: rgba(176, 176, 176, 0.5);
+  color: rgba(229, 231, 235, 0.4);
 }
 
 .input-cyber:focus {
-  border-color: #39FF14;
+  border-color: var(--cyber-neon);
   outline: none;
-  box-shadow: 0 0 5px rgba(57, 255, 20, 0.3), inset 0 0 5px rgba(57, 255, 20, 0.1);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
 }
 
+/* Badges / Operator Tags */
 .badge-cyber {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  border: 1px solid #39FF14;
-  color: #39FF14;
+  background-color: var(--cyber-surface);
+  border: 1px solid var(--cyber-border);
+  color: var(--cyber-gold);
   font-family: 'Roboto Mono', monospace;
-  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  letter-spacing: 0.1em;
 }
 
+/* Effects & Animations */
 .text-glow {
-  text-shadow: 0 0 10px var(--cyber-neon), 0 0 20px rgba(57, 255, 20, 0.5);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.8);
+}
+
+.neon-border {
+  position: relative;
+  border: 1px solid var(--cyber-neon);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3), inset 0 0 10px rgba(57, 255, 20, 0.1);
 }
 
 .skeleton-cyber {
-  background: linear-gradient(to right, #1A1A1D, #2D2D30, #1A1A1D);
+  background: linear-gradient(to right, var(--cyber-surface), var(--cyber-bg), var(--cyber-surface));
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -169,8 +241,8 @@ body {
 }
 
 @keyframes pulse-neon {
-  0%, 100% { box-shadow: 0 0 5px #39FF14, 0 0 20px rgba(57, 255, 20, 0.3); }
-  50% { box-shadow: 0 0 10px #39FF14, 0 0 40px rgba(57, 255, 20, 0.5); }
+  0%, 100% { box-shadow: 0 0 5px var(--cyber-neon), 0 0 10px rgba(57, 255, 20, 0.2); }
+  50% { box-shadow: 0 0 10px var(--cyber-neon), 0 0 25px rgba(57, 255, 20, 0.4); }
 }
 
 .animate-pulse-neon {
