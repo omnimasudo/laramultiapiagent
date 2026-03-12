@@ -11,6 +11,7 @@ export default function CartPage() {
 
   // Mencegah hydration mismatch saat load dari local storage
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
   }, []);
 

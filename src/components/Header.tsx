@@ -15,6 +15,7 @@ export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // eslint-disable-next-line
     setMounted(true);
   }, []);
 

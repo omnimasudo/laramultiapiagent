@@ -9,6 +9,7 @@ export default function SplashScreen() {
 
   useEffect(() => {
     // Mencegah hydration mismatch di Next.js
+    // eslint-disable-next-line
     setMounted(true);
     
     // Cek apakah user sudah pernah melihat splash screen di sesi ini

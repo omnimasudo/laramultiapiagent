@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getApisByIds } from '@/lib/api-data';
@@ -11,28 +11,27 @@ import ActionOverlay from '@/components/ActionOverlay';
 
 function ShareContent() {
   const searchParams = useSearchParams();
-  const [collection, setCollection] = useState<{ name: string; apis: API[] } | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const { addItem, isInCart } = useCartStore();
   
   // State untuk animasi Action Overlay
   const [overlay, setOverlay] = useState({ isOpen: false, message: '' });
 
-  useEffect(() => {
+  const { collection, error } = useMemo<{ collection: { name: string; apis: API[] } | null; error: string | null }>(() => {
     const data = searchParams.get('data');
-    if (data) {
-      try {
-        const decoded = JSON.parse(atob(data));
-        const apis = getApisByIds(decoded.apis);
-        setCollection({
+    if (!data) return { collection: null, error: 'TRANSMISSION FAILED: No payload data found' };
+    
+    try {
+      const decoded = JSON.parse(atob(data));
+      const apis = getApisByIds(decoded.apis);
+      return {
+        collection: {
           name: decoded.name || 'Classified Payload',
           apis
-        });
-      } catch (e) {
-        setError('TRANSMISSION CORRUPTED: Invalid share link');
-      }
-    } else {
-      setError('TRANSMISSION FAILED: No payload data found');
+        },
+        error: null
+      };
+    } catch {
+      return { collection: null, error: 'TRANSMISSION CORRUPTED: Invalid share link' };
     }
   }, [searchParams]);
 
