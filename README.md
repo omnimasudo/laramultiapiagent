@@ -32,7 +32,7 @@ LaraMultiApiAgent is not just a catalog; it is a **Tactical Orchestration Engine
 
 ---
 
-## ��� Modular Architecture
+## Modular Architecture
 
 LaraMultiApiAgent is built with a decoupled architecture to ensure high availability and low latency.
 
@@ -52,14 +52,14 @@ graph TD
     Store -->|Loadout| Cart[API Collection]
 ```
 
-### ��� Tactical Synchronization
+### Tactical Synchronization
 - **Sandbox Simulation**: Test API logic within a secure, AI-guided environment.
 - **Clara Search Advisor**: A specialized AI node that recommends technical sectors based on operator intent.
 - **Loadout Management**: Collect and export tactical API suites (JSON-ready).
 
 ---
 
-## ��� Core Technical Stack
+## Core Technical Stack
 
 | Layer | Technology | Implementation Detail |
 |----------|----------------------|-----------------------|
@@ -72,7 +72,7 @@ graph TD
 
 ---
 
-## ��� Intelligence Engine (Neural Pipeline)
+## Intelligence Engine (Neural Pipeline)
 
 LaraMultiApiAgent employs a **Dual-Node Verification Pipeline**:
 
@@ -82,7 +82,7 @@ LaraMultiApiAgent employs a **Dual-Node Verification Pipeline**:
 
 ---
 
-## ��� Deployment & Engineering
+## Deployment & Engineering
 
 ### Prerequisites
 - **Node.js** ^18.x
@@ -109,7 +109,7 @@ pnpm build
 
 ---
 
-## ��� Performance Benchmarks
+## Performance Benchmarks
 
 - **Search Latency**: < 5ms via debounced local filtering.
 - **UI Responsiveness**: 0ms Layout Shift (CLS) via fixed-aspect tactical containers.
@@ -117,13 +117,13 @@ pnpm build
 
 ---
 
-## ��� Security & Ethics
+## Security & Ethics
 
 LARA is engineered as a **Technical Guardrail**. It is programmed to identify secure endpoints (HTTPS, CORS clearance) and prioritize reliability over obscure, high-risk services. It is an operative that serves before it executes—calm in the digital storm.
 
 ---
 
-## ��� Community
+## Community
 
 Join the development of the next-gen API intelligence layer.
 
