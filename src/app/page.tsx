@@ -15,6 +15,20 @@ export default function Home() {
       
       {/* HERO SECTION */}
       <section className="relative w-full py-20 lg:py-32 overflow-hidden flex justify-center">
+        {/* CCTV / TACTICAL HUD OVERLAY */}
+        <div className="absolute inset-0 pointer-events-none z-20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
+          <div className="absolute top-10 left-10 p-4 border-l-2 border-t-2 border-cyber-neon/30 w-16 h-16"></div>
+          <div className="absolute top-10 right-10 p-4 border-r-2 border-t-2 border-cyber-neon/30 w-16 h-16 text-right">
+            <span className="font-mono text-[10px] text-cyber-neon/50">REC ● [CAM-01]</span>
+          </div>
+          <div className="absolute bottom-10 left-10 p-4 border-l-2 border-b-2 border-cyber-neon/30 w-16 h-16"></div>
+          <div className="absolute bottom-10 right-10 p-4 border-r-2 border-b-2 border-cyber-neon/30 w-16 h-16"></div>
+          
+          {/* Scanline effect */}
+          <div className="absolute inset-0 w-full h-full bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_4px,3px_100%] pointer-events-none opacity-20"></div>
+        </div>
+
         {/* Abstract Tactical Crosshairs / Decorations */}
         <div className="absolute inset-0 pointer-events-none opacity-20">
           <div className="absolute top-20 left-10 w-32 h-32 border-2 border-cyber-neon/30 rotate-45 chamfer"></div>
@@ -25,6 +39,24 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full text-center z-10">
           
+          {/* Main Logo Image with Glitch/CCTV effect */}
+          <div className="relative inline-block mb-8 group">
+             <div className="absolute -inset-1 bg-cyber-neon/20 blur-xl group-hover:bg-cyber-neon/40 transition-all"></div>
+             <div className="relative w-32 h-32 md:w-40 md:h-40 overflow-hidden border-2 border-cyber-neon/50 clip-tactical-b shadow-neon">
+                <img 
+                  src="/logo.jpeg" 
+                  alt="LARA Main Logo" 
+                  className="w-full h-full object-cover grayscale brightness-75 contrast-125 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                {/* Tactical Overlays on Image */}
+                <div className="absolute top-2 left-2 text-[8px] font-mono text-cyber-neon opacity-70">LARA_SYS_v2.6</div>
+                <div className="absolute bottom-2 right-2 text-[8px] font-mono text-cyber-neon opacity-70 flex items-center gap-1">
+                  <div className="w-1 h-1 bg-red-500 rounded-full animate-ping"></div> AUTH_ACTIVE
+                </div>
+             </div>
+          </div>
+
           {/* System Badge */}
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-cyber-surface border-2 border-cyber-border mb-8 shadow-tactical">
             <span className="w-2 h-2 bg-cyber-neon animate-pulse"></span>

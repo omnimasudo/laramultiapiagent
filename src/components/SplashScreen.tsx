@@ -1,34 +1,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Shield, Eye, Lock, Zap, Terminal } from 'lucide-react';
 
 export default function SplashScreen() {
   const [show, setShow] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [percent, setPercent] = useState(0);
 
   useEffect(() => {
-    // Mencegah hydration mismatch di Next.js
-    // eslint-disable-next-line
     setMounted(true);
     
-    // Cek apakah user sudah pernah melihat splash screen di sesi ini
     const hasVisited = sessionStorage.getItem('splashShown_laramultiapiagent');
     if (hasVisited) {
       setShow(false);
       return;
     }
     
-    // Jika belum, tampilkan splash screen
     setShow(true);
 
     const bootSequence = [
-      "INITIALIZING TACTICAL PROTOCOL...",
-      "LOADING laramultiapiagent KERNEL [OK]",
-      "BYPASSING SECURITY CLEARANCE [OK]",
-      "MOUNTING CYBER-MECHANIC UI [OK]",
-      "ESTABLISHING SECURE CONNECTION...",
-      "SYSTEM READY."
+      "ESTABLISHING CCTV UPLINK...",
+      "BYPASSING ENCRYPTION GATEWAY [OK]",
+      "SYNCING LARA_AGENT_v2.0...",
+      "MOUNTING TACTICAL INTERFACE...",
+      "CALIBRATING OPTIC SENSORS [OK]",
+      "UPLINK STABLE. WELCOME OPERATOR."
     ];
 
     let currentIndex = 0;
@@ -36,54 +35,111 @@ export default function SplashScreen() {
       if (currentIndex < bootSequence.length) {
         setLogs(prev => [...prev, bootSequence[currentIndex]]);
         currentIndex++;
+        setPercent(Math.floor((currentIndex / bootSequence.length) * 100));
       } else {
         clearInterval(interval);
-        // Beri jeda sejenak setelah log terakhir sebelum menutup layar
         setTimeout(() => {
           setShow(false);
           sessionStorage.setItem('splashShown_laramultiapiagent', 'true');
-        }, 1000);
+        }, 1200);
       }
-    }, 400); // Kecepatan ketikan log (400ms per baris)
+    }, 600);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Jangan render apapun jika tidak perlu ditampilkan (agar tidak nge-block UI)
   if (!mounted || !show) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-cyber-bg flex flex-col justify-end p-6 md:p-12 font-mono text-cyber-neon text-sm md:text-base border-8 border-cyber-border selection:bg-transparent overflow-hidden">
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 font-mono text-cyber-neon selection:bg-transparent overflow-hidden">
       
-      {/* Background overlay redup untuk feel terminal */}
-      <div className="absolute inset-0 cyber-grid opacity-20 pointer-events-none"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(26,26,26,0.8)_100%)] pointer-events-none"></div>
+      {/* CCTV / VHS Noise Style Background */}
+      <div className="absolute inset-0 opacity-10 cctv-noise"></div>
       
-      <div className="max-w-4xl w-full mx-auto relative z-10 mb-10">
-        <div className="mb-6 text-cyber-gold animate-pulse font-bold tracking-widest uppercase text-xs md:text-sm border-b-2 border-cyber-border pb-2 inline-block">
-          LARAMULTIAPIAGENT // BOOT SEQUENCE INITIATED
+      {/* Static Scanlines Overlay */}
+      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_4px,3px_100%] z-20"></div>
+
+      {/* CCTV HUD Elements */}
+      <div className="absolute top-8 left-8 p-4 border-l-2 border-t-2 border-cyber-neon/30 w-24 h-24">
+        <div className="flex items-center gap-2 text-[10px] opacity-70">
+          <div className="w-2 h-2 bg-red-600 rounded-full animate-ping"></div>
+          REC ● LIVE
+        </div>
+      </div>
+      <div className="absolute top-8 right-8 p-4 border-r-2 border-t-2 border-cyber-neon/30 w-24 h-24 text-right">
+        <div className="text-[10px] opacity-70 uppercase">CAM_01_RECON</div>
+        <div className="text-[10px] opacity-70 font-mono mt-1">AX-700_SYS</div>
+      </div>
+      <div className="absolute bottom-8 left-8 p-4 border-l-2 border-b-2 border-cyber-neon/30 w-24 h-24 flex items-end">
+        <div className="text-[10px] opacity-70">UPLINK_STABLE</div>
+      </div>
+      <div className="absolute bottom-8 right-8 p-4 border-r-2 border-b-2 border-cyber-neon/30 w-24 h-24 flex items-end justify-end">
+        <div className="text-[10px] opacity-70">2026.AR.99</div>
+      </div>
+
+      {/* Center Logo Area */}
+      <div className="relative mb-12 flex flex-col items-center">
+        <div className="relative w-48 h-48 md:w-64 md:h-64 overflow-hidden border-2 border-cyber-neon/40 shadow-[0_0_40px_rgba(57,255,20,0.15)] clip-tactical-b">
+          <img 
+            src="/logo.jpeg" 
+            alt="LARA Splash"
+            className="w-full h-full object-cover grayscale brightness-50 contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/80"></div>
+          
+          {/* Static Reticle Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+             <div className="absolute w-[80%] h-px bg-cyber-neon/40"></div>
+             <div className="absolute h-[80%] w-px bg-cyber-neon/40"></div>
+             <div className="w-12 h-12 border border-cyber-neon rounded-full flex items-center justify-center">
+                <div className="w-1 h-1 bg-cyber-neon rounded-full"></div>
+             </div>
+          </div>
         </div>
         
-        <div className="space-y-3">
+        <div className="mt-8 text-center px-4 py-2 border-y border-cyber-neon/20 backdrop-blur-sm">
+           <h2 className="text-xl md:text-2xl font-black uppercase tracking-[0.4em] text-glow mb-1">
+             LARA<span className="text-cyber-neon opacity-70">CONTROL</span>
+           </h2>
+           <div className="font-mono text-[9px] text-cyber-gold/80 tracking-[0.5em]">
+             S.Y.S_O.V.E.R.L.O.R.D_v2.0
+           </div>
+        </div>
+      </div>
+
+      {/* Boot Progress & Logs */}
+      <div className="max-w-md w-full relative z-10 px-4">
+        {/* Progress Bar */}
+        <div className="w-full h-1 bg-cyber-neon/10 mb-6 relative overflow-hidden">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${percent}%` }}
+            className="h-full bg-cyber-neon shadow-[0_0_10px_var(--cyber-neon)]"
+          />
+        </div>
+
+        <div className="space-y-2 h-32 overflow-hidden flex flex-col justify-end">
           {logs.map((log, index) => (
-            <div key={index} className="flex items-start">
-              <span className="opacity-50 mr-4 text-cyber-text-light">{`root@operator:~#`}</span> 
-              <span className="tracking-wider text-glow drop-shadow-[0_0_8px_rgba(57,255,20,0.8)]">{log}</span>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, x: -10 }} 
+              animate={{ opacity: 1, x: 0 }}
+              key={index} 
+              className="flex items-center gap-3 text-[10px] md:text-xs"
+            >
+              <span className="text-cyber-gold font-bold">[{index}]</span> 
+              <span className="tracking-tighter opacity-80">{log}</span>
+            </motion.div>
           ))}
-          
-          {/* Kursor berkedip saat log belum selesai */}
           {logs.length < 6 && (
-            <div className="flex items-center mt-2">
-              <span className="opacity-50 mr-4 text-cyber-text-light">{`root@operator:~#`}</span>
-              <div className="animate-pulse mt-1 w-3 h-5 bg-cyber-neon inline-block shadow-neon" />
+            <div className="flex items-center gap-2">
+              <span className="text-cyber-neon animate-pulse leading-none text-xs">_</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Efek garis scan CRT (Scanline) */}
-      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] z-50 opacity-20"></div>
+      {/* Full-screen Glitch Trigger Overlay */}
+      <div className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-10 bg-white/5 animate-pulse"></div>
     </div>
   );
 }

@@ -29,6 +29,11 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "laramultiapiagent | Tactical API Forge",
   description: "Advanced multi-API agent routing and management system with a tactical cyber-mechanic interface.",
+  icons: {
+    icon: '/logo.jpeg',
+    shortcut: '/logo.jpeg',
+    apple: '/logo.jpeg',
+  },
 };
 
 export default function RootLayout({
@@ -38,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable} ${robotoMono.variable}`}>
-      <body className="font-sans antialiased relative min-h-screen flex flex-col bg-cyber-bg text-cyber-text-light selection:bg-cyber-neon selection:text-cyber-bg">
+      <body className="font-sans antialiased relative min-h-screen flex flex-col text-cyber-text-light selection:bg-cyber-neon selection:text-cyber-bg">
         
         {/* Efek Background dan Splash Screen Interaktif */}
         <SplashScreen />

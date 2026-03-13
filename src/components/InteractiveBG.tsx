@@ -120,21 +120,21 @@ export default function InteractiveBG() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-cyber-bg">
+    <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-[#030303]">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
       />
       
       {/* 3. Static Ambient Glows */}
-      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] bg-cyber-neon opacity-[0.03] blur-[150px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyber-canvas opacity-[0.03] blur-[150px] rounded-full" />
+      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] bg-cyber-neon/10 blur-[150px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyber-canvas/5 blur-[150px] rounded-full" />
 
       {/* 4. Vertical Scanline Animation */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyber-neon/5 to-transparent h-[200%] animate-scan-line pointer-events-none opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyber-neon/10 to-transparent h-[200%] animate-scan-line pointer-events-none opacity-40" />
       
       {/* 5. Vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(26,26,26,0.8)_90%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none"></div>
     </div>
   );
 }

@@ -91,7 +91,7 @@ function ShareContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen cyber-grid flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-[#E0E0E0] mb-4" style={{ fontFamily: 'Orbitron, sans-serif' }}>
             INVALID LINK

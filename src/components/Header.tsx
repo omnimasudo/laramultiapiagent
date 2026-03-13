@@ -35,15 +35,20 @@ export default function Header() {
           
           {/* LOGO AREA */}
           <Link href="/" className="flex items-center gap-4 group relative">
-            <div className="relative w-12 h-12 flex items-center justify-center bg-cyber-bg border border-cyber-border group-hover:border-cyber-neon/50 transition-colors clip-tactical-b text-cyber-neon">
-               <Cpu className="w-6 h-6 animate-pulse" />
-               <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyber-gold/50 rounded-full"></div>
-               <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyber-neon/50 rounded-full"></div>
+            <div className="relative w-12 h-12 flex items-center justify-center bg-cyber-bg border border-cyber-border group-hover:border-cyber-neon/50 transition-colors clip-tactical-b overflow-hidden">
+               <img 
+                 src="/logo.jpeg" 
+                 alt="LARA Logo" 
+                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+               />
+               <div className="absolute inset-0 bg-gradient-to-t from-cyber-neon/20 to-transparent pointer-events-none"></div>
+               <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyber-gold/50 rounded-full z-10"></div>
+               <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyber-neon/50 rounded-full z-10"></div>
             </div>
             
             <div className="flex flex-col">
               <h1 className="font-heading text-xl md:text-2xl font-black text-cyber-text-light uppercase tracking-widest leading-none group-hover:text-glow transition-all">
-                API<span className="text-cyber-neon">FORGE</span>
+                LARA<span className="text-cyber-neon">MULTIAPIAGENT</span>
               </h1>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-1.5 h-1.5 bg-cyber-neon rounded-full animate-pulse"></span>
