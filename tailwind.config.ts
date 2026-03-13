@@ -39,12 +39,34 @@ export default {
       },
       animation: {
         'pulse-neon': 'pulse-neon 2s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'scan': 'scan 3s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'float-slow': 'float 12s ease-in-out infinite',
+        'drift': 'drift 10s linear infinite',
         'scan-line': 'scan-line 8s linear infinite',
         'shimmer': 'shimmer 1.5s infinite',
         'glitch': 'glitch 1s linear infinite',
         'spin-slow': 'spin 12s linear infinite',
+        'infinite-scroll': 'infinite-scroll 20s linear infinite',
       },
       keyframes: {
+        'scan': {
+          '0%': { top: '-10%' },
+          '100%': { top: '110%' }
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' }
+        },
+        'drift': {
+          '0%': { transform: 'translateX(-10%)' },
+          '100%': { transform: 'translateX(10%)' }
+        },
+        'infinite-scroll': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-100%)' },
+        },
         'pulse-neon': {
           '0%, 100%': { boxShadow: '0 0 5px var(--cyber-neon), 0 0 10px rgba(57, 255, 20, 0.2)' },
           '50%': { boxShadow: '0 0 10px var(--cyber-neon), 0 0 25px rgba(57, 255, 20, 0.4)' },

@@ -12,16 +12,16 @@
     --cyber-border: #1a1a1a;    /* Dark gray border */
 
     /* Primary Surfaces / Cards (Mechanic Apron) */
-    --cyber-canvas: #8c5e35;    /* Worn canvas brown */
-    --cyber-canvas-light: #a67c52; /* Khaki */
+    --cyber-canvas: #121212;    /* Dark tactical grey */
+    --cyber-canvas-light: #252525; /* Lighter tactical grey */
 
     /* Accents (Glowing Eye, Goggles) */
     --cyber-neon: #39FF14;      /* Toxic green */
-    --cyber-gold: #d4b856;      /* Muted gold (Hair/Brass) */
+    --cyber-gold: #FFD700;      /* Sharp Gold */
 
     /* Text Colors */
     --cyber-text-light: #e5e7eb; /* Off-white for dark bg */
-    --cyber-text-dark: #2d1b0d;  /* Dark brown for canvas cards */
+    --cyber-text-dark: #cccccc;  /* Light grey for dark cards */
   }
 }
 
@@ -93,6 +93,22 @@
     background-size: 100% 4px;
     animation: scanline 0.2s linear infinite;
     pointer-events: none;
+  }
+
+  .bg-grid-mecha {
+    background-image: 
+      linear-gradient(to right, rgba(57, 255, 20, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .reflection-mask {
+    mask-image: linear-gradient(to top, black, transparent);
+    -webkit-mask-image: linear-gradient(to top, black, transparent);
   }
 }
 

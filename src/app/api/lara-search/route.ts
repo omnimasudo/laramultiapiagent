@@ -6,9 +6,14 @@ import type { API } from '@/lib/supabase';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 export async function POST(req: Request) {
+  let query: string = '';
+  let apis: API[] = [];
+
   try {
     const body = await req.json();
-    const { query, apis } = body as { query: string; apis: API[] };
+    const parsed = body as { query: string; apis: API[] };
+    query = parsed.query;
+    apis = parsed.apis;
 
     if (!query) {
       return NextResponse.json({ reply: "Awaiting query input." }, { status: 400 });
@@ -61,26 +66,78 @@ export async function POST(req: Request) {
       content: query
     };
 
-    // Call OpenRouter with Mistral
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000', 
-        'X-Title': 'Lara Multi-API Agent Hub',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'mistralai/mistral-small-24b-instruct-2501',
-        messages: [systemPrompt, userPrompt],
-        temperature: 0.2, // Very low temperature so it strictly sticks to the provided API list
-      }),
-    });
+    // Retry logic to handle transient network errors (ECONNRESET)
+    // We try up to 3 times with a short delay
+    let response;
+    let lastError;
+    
+    for (let i = 0; i < 3; i++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+        try {
+            response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                    'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000', 
+                    'X-Title': 'Lara Multi-API Agent Hub',
+                    'Content-Type': 'application/json',
+                    'Connection': 'close', // Disable keep-alive to reduce ECONNRESET likelihood
+                },
+                body: JSON.stringify({
+                    model: 'mistralai/mistral-small-24b-instruct-2501',
+                    messages: [systemPrompt, userPrompt],
+                    temperature: 0.2, // Very low temperature
+                }),
+                signal: controller.signal,
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (response.ok) break; // Success, exit loop
+            
+            // If it's a 5xx error, maybe retry, but for now we just break on non-network errors unless it's a rate limit
+            if (response.status !== 429 && response.status < 500) break;
+
+        } catch (error) {
+            clearTimeout(timeoutId);
+            lastError = error;
+            console.warn(`Attempt ${i + 1} failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            if (i < 2) await new Promise(res => setTimeout(res, 1000)); // Wait 1s before retry
+        }
+    }
+
+    if (!response) {
+        throw lastError || new Error("Failed to connect to AI service after multiple attempts.");
+    }
 
     const data = await response.json();
 
     if (!response.ok) {
       console.error('OpenRouter Search API Error:', data);
+      
+      // If it's an auth error, fall back to mock mode
+      if (response.status === 401 || response.status === 403) {
+        console.warn("OpenRouter API Key invalid. Falling back to mock mode.");
+        const lowerQuery = query.toLowerCase();
+        const recommended = apis.filter((a) => 
+          a.name.toLowerCase().includes(lowerQuery) || 
+          a.description.toLowerCase().includes(lowerQuery) ||
+          a.category.toLowerCase().includes(lowerQuery)
+        ).slice(0, 3);
+        
+        let reply = "AUTHENTICATION ERROR: API key invalid. Using offline mode.\n\nBased on your request, here are my recommendations:\n\n";
+        if (recommended.length > 0) {
+          recommended.forEach((a) => {
+            reply += `- **${a.name}** (${a.category}): ${a.description.substring(0, 100)}...\n`;
+          });
+        } else {
+          reply += "I couldn't find any specific API matching your criteria in the current registry. Try broader terms.";
+        }
+        return NextResponse.json({ reply });
+      }
+      
       return NextResponse.json(
         { reply: "CONNECTION FAILED: Uplink to Lara central node disrupted." }, 
         { status: 500 }
@@ -91,6 +148,53 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Lara Search Route Error:', error);
+    
+    // Handle different types of errors
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        console.warn("OpenRouter request timed out. Falling back to mock mode.");
+        // Fallback to mock response on timeout
+        const lowerQuery = query.toLowerCase();
+        const recommended = apis.filter((a) => 
+          a.name.toLowerCase().includes(lowerQuery) || 
+          a.description.toLowerCase().includes(lowerQuery) ||
+          a.category.toLowerCase().includes(lowerQuery)
+        ).slice(0, 3);
+        
+        let reply = "TIMEOUT ERROR: Connection to AI service timed out. Using offline mode.\n\nBased on your request, here are my recommendations:\n\n";
+        if (recommended.length > 0) {
+          recommended.forEach((a) => {
+            reply += `- **${a.name}** (${a.category}): ${a.description.substring(0, 100)}...\n`;
+          });
+        } else {
+          reply += "I couldn't find any specific API matching your criteria in the current registry. Try broader terms.";
+        }
+        return NextResponse.json({ reply });
+      }
+      
+      // Handle network errors like ECONNRESET
+      if (error.message.includes('ECONNRESET') || error.message.includes('fetch failed')) {
+        console.warn("Network error detected. Falling back to mock mode.");
+        // Fallback to mock response on network errors
+        const lowerQuery = query.toLowerCase();
+        const recommended = apis.filter((a) => 
+          a.name.toLowerCase().includes(lowerQuery) || 
+          a.description.toLowerCase().includes(lowerQuery) ||
+          a.category.toLowerCase().includes(lowerQuery)
+        ).slice(0, 3);
+        
+        let reply = "NETWORK ERROR: Connection reset. Using offline mode.\n\nBased on your request, here are my recommendations:\n\n";
+        if (recommended.length > 0) {
+          recommended.forEach((a) => {
+            reply += `- **${a.name}** (${a.category}): ${a.description.substring(0, 100)}...\n`;
+          });
+        } else {
+          reply += "I couldn't find any specific API matching your criteria in the current registry. Try broader terms.";
+        }
+        return NextResponse.json({ reply });
+      }
+    }
+    
     return NextResponse.json(
       { reply: "CRITICAL ERROR: Internal server malfunction." }, 
       { status: 500 }

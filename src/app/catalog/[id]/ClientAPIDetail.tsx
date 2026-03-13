@@ -44,7 +44,10 @@ export default function ClientAPIDetail({ id }: { id: string }) {
   }, [id]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only scroll if the new message is at the bottom, or forced
+    if (messagesEndRef.current) {
+         messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }, [messages]);
 
   const toggleCart = () => {
@@ -56,12 +59,12 @@ export default function ClientAPIDetail({ id }: { id: string }) {
     }
   };
 
-  const suggestions = [
-    "How do I authenticate?",
-    "Show me a Python code example",
-    "What are the common error codes?",
-    "Simulate a successful GET response"
-  ];
+  const suggestions = api ? [
+    `How do I authenticate with ${api.name}?`,
+    `Show me a Python code example for ${api.name}`,
+    `What are the endpoints for ${api.name}?`,
+    `Explain what ${api.name} does in simple terms`
+  ] : [];
 
   const handleSendMessage = async (e?: React.FormEvent, presetMsg?: string) => {
     e?.preventDefault();
@@ -152,27 +155,24 @@ export default function ClientAPIDetail({ id }: { id: string }) {
                     <p className="font-mono text-sm uppercase text-cyber-neon">{api.auth || 'None'}</p>
                   </div>
                 </div>
-                <div className="bg-black/40 border border-cyber-surface p-4 flex items-center gap-3">
-                  <Server className="w-5 h-5 text-cyber-text-light/50" />
-                  <div>
-                    <p className="text-[10px] text-cyber-text-light/50 font-mono">BASE URL</p>
-                    <p className="font-mono text-sm truncate text-cyber-text-light">{api.url || 'api.example.com'}</p>
+                <div className="bg-black/40 border border-cyber-surface p-4 flex items-center gap-3 overflow-hidden">
+                  <Server className="w-5 h-5 text-cyber-text-light/50 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] text-cyber-text-light/50 font-mono whitespace-nowrap">BASE URL</p>
+                    <p className="font-mono text-sm truncate text-cyber-text-light break-all" title={api.url}>{api.url || 'api.example.com'}</p>
                   </div>
                 </div>
               </div>
 
-              <button
-                onClick={toggleCart}
-                className={clsx(
-                  "w-full py-4 px-6 flex items-center justify-center gap-3 font-heading text-sm font-bold uppercase tracking-widest transition-all duration-300 clip-tactical",
-                  inCart 
-                    ? "bg-cyber-canvas text-cyber-neon border-cyber-neon shadow-neon" 
-                    : "bg-cyber-neon/10 border border-cyber-neon text-cyber-neon hover:bg-cyber-neon hover:text-black hover:shadow-neon"
-                )}
+              <a
+                href={api.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 px-6 flex items-center justify-center gap-3 font-heading text-sm font-bold uppercase tracking-widest transition-all duration-300 clip-tactical bg-cyber-neon/10 border border-cyber-neon text-cyber-neon hover:bg-cyber-neon hover:text-black hover:shadow-neon"
               >
-                {inCart ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                {inCart ? 'API Added to Loadout' : 'Add to Cart / Uplink'}
-              </button>
+                 <Zap className="w-5 h-5" />
+                 Use API Endpoint
+              </a>
             </motion.div>
           </div>
 
@@ -196,18 +196,23 @@ export default function ClientAPIDetail({ id }: { id: string }) {
                 </div>
               </div>
 
-              <div className="flex-grow p-4 overflow-y-auto font-mono text-sm space-y-4 custom-scrollbar z-10">
+
+              <div className="flex-grow flex flex-col p-4 overflow-y-auto font-mono text-sm space-y-4 custom-scrollbar z-10 scroll-smooth">
                 {messages.map((msg, idx) => (
                   <div key={idx} className={clsx("flex gap-3", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
-                    <div className="shrink-0 w-6 h-6 rounded bg-cyber-surface flex items-center justify-center border border-cyber-border overflow-hidden">
+                    <div className="shrink-0">
                       {msg.role === 'user' ? (
-                        <User className="w-3 h-3 text-cyber-text-light/50" />
+                        <div className="w-8 h-8 rounded bg-cyber-surface border border-cyber-border flex items-center justify-center">
+                           <User className="w-4 h-4 text-cyber-text-light/50" />
+                        </div>
                       ) : (
-                        <img src="/logo.jpeg" alt="LARA" className="w-full h-full object-cover opacity-80" />
+                        <div className="w-8 h-8 rounded border border-cyber-neon/50 overflow-hidden bg-black">
+                           <img src="/logo.jpeg" alt="LARA" className="w-full h-full object-cover opacity-80" />
+                        </div>
                       )}
                     </div>
                     <div className={clsx(
-                      "p-3 max-w-[85%] rounded-sm whitespace-pre-wrap break-words",
+                      "p-3 max-w-[85%] rounded-sm whitespace-pre-wrap break-words text-xs md:text-sm",
                       msg.role === 'user' 
                         ? "bg-cyber-surface/50 text-cyber-text-light border border-cyber-border" 
                         : "bg-cyber-neon/5 text-cyber-neon border border-cyber-neon/20 shadow-[inset_0_0_10px_rgba(57,255,20,0.05)]"
@@ -217,13 +222,14 @@ export default function ClientAPIDetail({ id }: { id: string }) {
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="flex gap-3">
-                    <div className="shrink-0 w-6 h-6 rounded bg-cyber-surface flex items-center justify-center border border-cyber-border">
-                      <Bot className="w-3 h-3 text-cyber-neon" />
-                    </div>
-                    <div className="p-3 text-cyber-neon animate-pulse flex items-center gap-1">
-                      <Terminal className="w-3 h-3" /> Processing...
-                    </div>
+                  <div className="flex gap-3 animate-pulse">
+                     <div className="w-8 h-8 rounded border border-cyber-neon/50 overflow-hidden bg-black flex items-center justify-center">
+                        <Bot className="w-4 h-4 text-cyber-neon" />
+                     </div>
+                     <div className="p-3 bg-cyber-neon/5 border border-cyber-neon/20 text-cyber-neon text-xs flex items-center gap-2">
+                        <Terminal className="w-3 h-3 animate-spin-slow" /> 
+                        <span className="tracking-widest">PROCESSING_REQUEST...</span>
+                     </div>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
@@ -234,15 +240,25 @@ export default function ClientAPIDetail({ id }: { id: string }) {
                   {suggestions.map((s, idx) => (
                     <button 
                       key={idx}
-                      onClick={() => handleSendMessage(undefined, s)} 
-                      className="whitespace-nowrap px-3 py-1 text-[10px] font-mono border border-cyber-neon/30 text-cyber-neon/70 hover:text-cyber-neon hover:border-cyber-neon hover:bg-cyber-neon/10 transition-colors"
+                      type="button" 
+                      onClick={(e) => {
+                          e.preventDefault(); 
+                          handleSendMessage(undefined, s);
+                      }} 
+                      className="whitespace-nowrap px-3 py-1 text-[10px] font-mono border border-cyber-neon/30 text-cyber-neon/70 hover:text-cyber-neon hover:border-cyber-neon hover:bg-cyber-neon/10 transition-colors shrink-0"
                     >
                       {s}
                     </button>
                   ))}
                 </div>
 
-                <form onSubmit={handleSendMessage} className="flex gap-2">
+                <form 
+                    onSubmit={(e) => {
+                        e.preventDefault(); // Prevent full page reload
+                        handleSendMessage(e); 
+                    }} 
+                    className="flex gap-2"
+                >
                   <input
                     type="text"
                     value={input}

@@ -89,26 +89,9 @@ export default function CatalogPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Section 1: Standard API Search */}
-          <div className="relative group">
-            <div className="absolute inset-0 bg-cyber-neon/5 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="relative bg-black/80 border border-cyber-border clip-tactical p-2 flex items-center gap-2 focus-within:border-cyber-neon focus-within:shadow-neon transition-all duration-300">
-              <div className="w-12 h-12 shrink-0 bg-cyber-surface border border-cyber-border flex items-center justify-center">
-                <Search className="w-5 h-5 text-cyber-text-light/50" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Filter by name, category, or keyword..."
-                className="flex-grow bg-transparent border-none text-cyber-text-light font-mono text-sm px-4 py-3 focus:outline-none focus:ring-0 placeholder:text-cyber-text-light/30"
-              />
-            </div>
-          </div>
-
-          {/* Section 2: Ask Lara */}
-          <div className="relative group">
+        <div className="grid grid-cols-1 mb-12">
+          {/* Section 2: Ask Lara (Expanded to full width) */}
+          <div className="relative group max-w-2xl mx-auto w-full">
             <div className="absolute inset-0 bg-cyber-gold/5 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <form 
               onSubmit={handleAskLara}
@@ -122,7 +105,7 @@ export default function CatalogPage() {
                 type="text"
                 value={laraQuery}
                 onChange={(e) => setLaraQuery(e.target.value)}
-                placeholder="Ask Clara (e.g., 'Best API for tracking crypto?')..."
+                placeholder="Ask Clara: 'Show me crypto APIs' or 'Find weather data'..."
                 className="flex-grow bg-transparent border-none text-cyber-text-light font-mono text-sm px-4 py-3 focus:outline-none focus:ring-0 placeholder:text-cyber-text-light/30"
               />
               <button

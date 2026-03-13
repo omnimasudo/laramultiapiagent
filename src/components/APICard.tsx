@@ -74,23 +74,10 @@ export default function APICard({ api }: APICardProps) {
           <div className="flex gap-2 flex-1">
             <Link 
               href={`/catalog/${api.id}`}
-              className="flex-1 py-2 px-3 text-center font-heading text-[11px] font-bold uppercase tracking-widest bg-cyber-neon/10 border border-cyber-neon/30 text-cyber-neon hover:bg-cyber-neon hover:text-black transition-all duration-300 clip-tactical-sm"
+              className="flex-1 py-3 px-3 text-center font-heading text-[11px] font-bold uppercase tracking-widest bg-cyber-neon/10 border border-cyber-neon/30 text-cyber-neon hover:bg-cyber-neon hover:text-black transition-all duration-300 clip-tactical-sm group-hover:shadow-[0_0_10px_rgba(57,255,20,0.2)]"
             >
-              View Details
+              Initialize Details
             </Link>
-            
-            <button
-              onClick={toggleCart}
-              className={clsx(
-                "flex-1 py-2 px-3 flex items-center justify-center gap-2 font-heading text-[11px] font-bold uppercase tracking-widest border transition-all duration-300 clip-tactical-sm",
-                inCart 
-                  ? "bg-cyber-canvas text-cyber-neon border-cyber-neon" 
-                  : "bg-transparent border-cyber-border text-cyber-text-light/70 hover:border-cyber-text-light hover:text-cyber-text-light"
-              )}
-            >
-              {inCart ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-              {inCart ? 'Acquired' : 'Add to Cart'}
-            </button>
           </div>
 
           <div className="shrink-0 w-8 h-8 flex items-center justify-center opacity-50 group-hover:opacity-100 transition-opacity">

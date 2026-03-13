@@ -11,10 +11,20 @@ export default function Home() {
     .slice(0, 8);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start w-full">
+    <div className="min-h-screen flex flex-col items-center justify-start w-full relative z-10">
       
       {/* HERO SECTION */}
       <section className="relative w-full py-20 lg:py-32 overflow-hidden flex justify-center">
+        {/* HERO BACKGROUND IMAGE - Reduced opacity to show Interactive BG */}
+        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+          <img 
+            src="/lara-black-bg.jpeg" 
+            alt="Hero Background" 
+            className="w-full h-full object-cover mix-blend-luminosity grayscale contrast-125 brightness-75 sepia-[0.3]" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+        </div>
+
         {/* CCTV / TACTICAL HUD OVERLAY */}
         <div className="absolute inset-0 pointer-events-none z-20">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
@@ -39,24 +49,6 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full text-center z-10">
           
-          {/* Main Logo Image with Glitch/CCTV effect */}
-          <div className="relative inline-block mb-8 group">
-             <div className="absolute -inset-1 bg-cyber-neon/20 blur-xl group-hover:bg-cyber-neon/40 transition-all"></div>
-             <div className="relative w-32 h-32 md:w-40 md:h-40 overflow-hidden border-2 border-cyber-neon/50 clip-tactical-b shadow-neon">
-                <img 
-                  src="/logo.jpeg" 
-                  alt="LARA Main Logo" 
-                  className="w-full h-full object-cover grayscale brightness-75 contrast-125 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                {/* Tactical Overlays on Image */}
-                <div className="absolute top-2 left-2 text-[8px] font-mono text-cyber-neon opacity-70">LARA_SYS_v2.6</div>
-                <div className="absolute bottom-2 right-2 text-[8px] font-mono text-cyber-neon opacity-70 flex items-center gap-1">
-                  <div className="w-1 h-1 bg-red-500 rounded-full animate-ping"></div> AUTH_ACTIVE
-                </div>
-             </div>
-          </div>
-
           {/* System Badge */}
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-cyber-surface border-2 border-cyber-border mb-8 shadow-tactical">
             <span className="w-2 h-2 bg-cyber-neon animate-pulse"></span>
@@ -70,11 +62,10 @@ export default function Home() {
 
           {/* Main Heading */}
           <h1 className="font-heading text-5xl sm:text-6xl lg:text-8xl font-black mb-6 leading-none uppercase tracking-tight">
-            <span className="text-cyber-text-light">Deploy Your</span>
+            <span className="text-cyber-text-light">Discover.</span>
+            <span className="text-cyber-neon text-glow ml-2 md:ml-4 drop-shadow-[0_0_15px_rgba(57,255,20,0.5)]">Integrate.</span>
             <br />
-            <span className="text-cyber-neon text-glow drop-shadow-[0_0_15px_rgba(57,255,20,0.5)]">
-              API Arsenal
-            </span>
+            <span className="text-cyber-text-light">Build.</span>
           </h1>
 
           {/* Subheading */}
@@ -100,8 +91,74 @@ export default function Home() {
         </div>
       </section>
 
+      {/* INFINITE LOGO SCROLL - ENHANCED & FIXED */}
+      <section className="w-full py-24 bg-cyber-bg/50 border-y border-cyber-border overflow-hidden relative backdrop-blur-sm">
+        <div className="absolute inset-0 bg-cyber-neon/5 pointer-events-none" />
+        
+        {/* Scroller Container */}
+        <div className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
+           
+           {/* Logo List 1 */}
+           <ul className="flex items-center justify-start [&_li]:mx-8 animate-infinite-scroll">
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/kotak4.png" alt="Kotak" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 filter brightness-150" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/circle.png" alt="Circle" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/chatgpt.png" alt="ChatGPT" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 border border-cyber-border rounded-full" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/10 border border-white/20 rounded-3xl backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.15)] ring-1 ring-white/30">
+                <img src="/postman.png" alt="Postman" className="h-24 w-auto object-contain opacity-100 transition-opacity grayscale-0" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/zapier.png" alt="Zapier" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+              </li>
+           </ul>
+
+           {/* Logo List 2 (Duplicate) */}
+           <ul className="flex items-center justify-start [&_li]:mx-8 animate-infinite-scroll" aria-hidden="true">
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/kotak4.png" alt="Kotak" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 filter brightness-150" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/circle.png" alt="Circle" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/chatgpt.png" alt="ChatGPT" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 border border-cyber-border rounded-full" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/10 border border-white/20 rounded-3xl backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.15)] ring-1 ring-white/30">
+                <img src="/postman.png" alt="Postman" className="h-24 w-auto object-contain opacity-100 transition-opacity grayscale-0" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/zapier.png" alt="Zapier" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+              </li>
+           </ul>
+
+           {/* Logo List 3 (Duplicate for Safety) */}
+           <ul className="flex items-center justify-start [&_li]:mx-8 animate-infinite-scroll" aria-hidden="true">
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/kotak4.png" alt="Kotak" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 filter brightness-150" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/circle.png" alt="Circle" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/chatgpt.png" alt="ChatGPT" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 border border-cyber-border rounded-full" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/10 border border-white/20 rounded-3xl backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.15)] ring-1 ring-white/30">
+                <img src="/postman.png" alt="Postman" className="h-24 w-auto object-contain opacity-100 transition-opacity grayscale-0" />
+              </li>
+              <li className="w-72 h-44 flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                <img src="/zapier.png" alt="Zapier" className="h-24 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+              </li>
+           </ul>
+        </div>
+      </section>
+
       {/* STATS HUD SECTION */}
-      <section className="w-full py-12 border-y border-cyber-border bg-[#030303] relative overflow-hidden">
+      <section className="w-full py-12 border-b border-cyber-border bg-[#030303]/80 backdrop-blur-sm relative overflow-hidden">
         <div className="absolute inset-0 cyber-grid opacity-20 pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x-0 md:divide-x divide-cyber-border/30">
@@ -126,7 +183,7 @@ export default function Home() {
       </section>
 
       {/* TACTICAL CATEGORIES SECTION */}
-      <section className="w-full py-20 relative overflow-hidden bg-cyber-bg">
+      <section className="w-full py-20 relative overflow-hidden bg-cyber-bg/50 backdrop-blur-md">
         {/* Decorative background elements for this section */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-cyber-neon/5 to-transparent pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-t from-cyber-gold/5 run-scanline to-transparent pointer-events-none" />

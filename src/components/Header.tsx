@@ -9,20 +9,19 @@ import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 
 export default function Header() {
-  const { items } = useCartStore();
+  const { items, initializeFromStorage } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    // eslint-disable-next-line
+    initializeFromStorage();
     setMounted(true);
-  }, []);
+  }, [initializeFromStorage]);
 
   const navLinks = [
     { href: '/', label: 'Base' },
     { href: '/catalog', label: 'Catalog' },
-    { href: '/share', label: 'Share API' },
   ];
 
   return (
@@ -95,20 +94,14 @@ export default function Header() {
           {/* ACTIONS */}
           <div className="flex items-center gap-6">
             <Link
-              href="/cart"
-              className="relative group p-2"
+              href="/catalog"
+              className="flex items-center gap-2 px-4 py-2 bg-cyber-neon/10 hover:bg-cyber-neon/20 border border-cyber-neon/50 text-cyber-neon font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 clip-tactical-sm hover:shadow-neon"
             >
-              <div className="relative">
-                <ShoppingCart className="w-6 h-6 text-cyber-text-light group-hover:text-cyber-neon transition-colors" />
-                {mounted && items.length > 0 && (
-                  <span className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-cyber-neon text-black text-[10px] font-bold font-mono rounded-sm shadow-neon animate-pulse-slow">
-                    {items.length}
-                  </span>
-                )}
-              </div>
+              <Terminal className="w-4 h-4" />
+              Access Hub
             </Link>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Kept for mobile nav */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 text-cyber-text-light hover:text-cyber-neon transition-colors border border-transparent hover:border-cyber-neon/30"

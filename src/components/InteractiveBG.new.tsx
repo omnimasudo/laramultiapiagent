@@ -8,6 +8,7 @@ export default function InteractiveBG() {
   const [opacity, setOpacity] = useState(0)
   const [mounted, setMounted] = useState(false)
 
+  // Fix hydration mismatch by only rendering random elements after mount
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -19,7 +20,10 @@ export default function InteractiveBG() {
     setOpacity(1)
   }
 
-  if (!mounted) return <div className="fixed inset-0 z-0 bg-[#050505]" />;
+  // Static background for server/initial render
+  if (!mounted) {
+    return <div className="fixed inset-0 z-0 bg-[#050505]" />;
+  }
 
   return (
     <div 

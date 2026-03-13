@@ -69,24 +69,38 @@ export default function CartPage() {
   return (
     <div className="w-full max-w-4xl mx-auto py-8">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 border-l-4 border-cyber-neon pl-4">
-        <div>
-          <h1 className="font-heading text-3xl font-black text-cyber-text-light mb-1 uppercase tracking-widest">
-            Active Payload
-          </h1>
-          <div className="inline-flex items-center gap-2 font-mono text-cyber-neon text-xs uppercase tracking-widest font-bold">
-            <span className="w-2 h-2 bg-cyber-neon animate-pulse"></span>
-            {items.length} Target{items.length !== 1 ? 's' : ''} Locked
+      {/* Header with tactical visuals */}
+      <div className="relative mb-10 p-6 border border-cyber-border bg-cyber-surface/50 overflow-hidden group">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
+        <div className="absolute top-0 left-0 w-1 h-full bg-cyber-neon shadow-[0_0_10px_var(--cyber-neon)]"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyber-neon/10 to-transparent pointer-events-none"></div>
+        
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+               <div className="w-3 h-3 bg-red-600 animate-pulse rounded-full shadow-[0_0_8px_red]"></div>
+               <span className="font-mono text-xs text-red-500 tracking-widest uppercase">System Protocol: PURGE_READY</span>
+            </div>
+            <h1 className="font-heading text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyber-text-light to-gray-500 uppercase tracking-widest mb-2 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+              Active Payload
+            </h1>
+            <div className="inline-flex items-center gap-2 font-mono text-cyber-neon text-xs uppercase tracking-widest font-bold border border-cyber-neon/30 px-3 py-1 bg-cyber-neon/5">
+              <span className="w-2 h-2 bg-cyber-neon animate-pulse"></span>
+              STATUS: {items.length} Target{items.length !== 1 ? 's' : ''} Locked
+            </div>
           </div>
+          
+          <button
+            onClick={clearCart}
+            className="group relative px-6 py-2 overflow-hidden bg-black border border-red-900/50 text-red-500 font-mono text-xs uppercase font-bold tracking-widest hover:text-red-400 transition-all hover:border-red-500 hover:shadow-[0_0_15px_rgba(220,38,38,0.4)]"
+          >
+            <span className="absolute inset-0 w-full h-full bg-red-900/10 group-hover:bg-red-900/20 transition-all"></span>
+            <span className="relative flex items-center gap-2">
+              <Trash2 className="w-4 h-4" />
+              Abort Sequence
+            </span>
+          </button>
         </div>
-        <button
-          onClick={clearCart}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-red-950/20 border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all font-mono text-xs uppercase font-bold tracking-widest chamfer-sm group"
-        >
-          <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-          Abort All
-        </button>
       </div>
 
       {/* Cart Items List */}
