@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store';
-import { ShoppingCart, Menu, X, Terminal, Cpu } from 'lucide-react';
+import { ShoppingCart, Menu, X, Terminal, Cpu, Github, Twitter } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -93,6 +93,29 @@ export default function Header() {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-6">
+            
+            {/* Social Links */}
+            <div className="hidden md:flex items-center gap-4 border-r border-cyber-text-light/20 pr-6">
+               <a 
+                 href="https://github.com/omnimasudo/laramultiapiagent" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 className="text-cyber-text-light/70 hover:text-cyber-neon transition-colors transform hover:scale-110"
+                 aria-label="GitHub Repository"
+               >
+                  <Github className="w-5 h-5" />
+               </a>
+               <a 
+                 href="https://x.com/Laraagentt" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 className="text-cyber-text-light/70 hover:text-cyber-neon transition-colors transform hover:scale-110"
+                 aria-label="X (Twitter) Profile"
+               >
+                  <Twitter className="w-5 h-5" />
+               </a>
+            </div>
+
             <Link
               href="/catalog"
               className="flex items-center gap-2 px-4 py-2 bg-cyber-neon/10 hover:bg-cyber-neon/20 border border-cyber-neon/50 text-cyber-neon font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 clip-tactical-sm hover:shadow-neon"
