@@ -2,7 +2,7 @@ Official X Account: https://x.com/Laraagentt
 
 Official Website: https://www.laramultiapiagent.site/
 
-Contract Address: 
+Contract Address: GUq1ddbq4LqXkzfbRbztoSD2P7NvpVF9ppxiopkHpump
 
 <p align="center">
   <img src="public/logo.jpeg" alt="LARA Agent" width="180px" style="border-radius: 20px; border: 2px solid #39FF14; box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);">
